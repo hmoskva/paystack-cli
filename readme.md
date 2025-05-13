@@ -17,6 +17,33 @@ With the CLI, you can:
 4. Interact with Paystack API
 5. *Interpret Paystack API Errors*
 
+## Local setup
+
+1. npm install
+2. `npm link` . This command creates a symbolic link from your global node_modules to your local project directory. This allows you to run the paystack command from anywhere in your terminal, and it will use your local code.
+3. Test that it works 
+  ```
+    paystack --version
+    paystack login
+    # any other paystack command
+  ```
+4. Unlinking: When you're done and want to remove the link (perhaps to reinstall the official published version), you can run:
+```
+  npm unlink @paystack-oss/dev-cli
+```
+5. Now it is linked, update ngrok to the latest version
+```
+npm i ngrok@latest
+```
+
+## Local ngrok notes
+Default version used an outdated version of ngrok. To fix shortcomings, this version uses [v5.0.0-beta.2](https://www.npmjs.com/package/ngrok?activeTab=readme). To get it working with the CLI, ensure that your ngrok authtoken is discoverable where CLI is running. This will automatically happen if youve authenticated ngrok `ngrok config add-authtoken [AUTH_TOKEN]. If its not discoverable by default, you can export the authtoken in same shell youre running the CLI
+```
+  NGROK_CONFIG="$HOME/Library/Application Support/ngrok/ngrok.yml"
+  // OR
+  NGROK_AUTHTOKEN="YOUR_ACTUAL_AUTHTOKEN"
+```
+
 ## Installing the Paystack CLI
 
 ### Install with npm
@@ -62,7 +89,7 @@ Whenever actions are carried out on your Paystack account, we trigger events whi
 
 The CLI lets you listen to real-time webhook events on your integration and reduces all these steps are reduced to running a single command —
 
-`$ paystack webhook listen localhost:8080/webhook`
+`$ paystack webhook listen --forward localhost:9000/api/v1/payments/webhooks/paystack`
 
 This command tunnels all your test webhook events to your local server running on port 8080, making it possible for you to run end-to-end tests on your Paystack integration while in development mode.
 
@@ -71,6 +98,8 @@ You can also run health checks on your webhook URL by sending a sample webhook p
 `$ paystack webhook ping --event transfer.success --domain test`
 
  Check our [documentation](https://paystack.com/docs/payments/webhooks/#supported-events) for a list of supported events.
+
+ This was broken as the event flag was missing in [commands config](/src/commands/webhooks). This version includes the flag so you can safely run sample requests. Add additional sample data in [samples file](/src/lib/samples). 
 
 ### Use Sample Apps
 
